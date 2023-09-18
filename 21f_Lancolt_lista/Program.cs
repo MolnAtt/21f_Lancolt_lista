@@ -10,15 +10,15 @@ namespace _21f_Lancolt_lista
 	internal class Program
 	{
 
-		class Lancolt_lista
+		class Lancolt_lista<S>
 		{
-			class Elem
+			class Elem<T>
 			{
-				public Elem elozo;
-				public int tartalom;
-				public Elem kovetkezo;
+				public Elem<T> elozo;
+				public T tartalom;
+				public Elem<T> kovetkezo;
 
-				public Elem(Elem elozo, int tartalom, Elem kovetkezo)
+				public Elem(Elem<T> elozo, T tartalom, Elem<T> kovetkezo)
 				{
 					this.elozo = elozo;
 					this.tartalom = tartalom;
@@ -37,10 +37,10 @@ namespace _21f_Lancolt_lista
 				/// <summary>
 				/// Ez a konstruktor fűz hozzá egy elemhez egy másikat.
 				/// </summary>
-				public Elem(Elem kijelolt, int tartalom)
+				public Elem(Elem<T> kijelolt, T tartalom)
 				{
 					this.tartalom = tartalom;
-					Elem új = this;
+					Elem<T> új = this;
 					új.elozo = kijelolt;
 					új.kovetkezo = kijelolt.kovetkezo;
 					kijelolt.kovetkezo.elozo = új;
@@ -49,31 +49,32 @@ namespace _21f_Lancolt_lista
 
 				public void Torol()
 				{
-					this.kovetkezo.
+					this.kovetkezo.elozo = this.elozo;
+					this.elozo.kovetkezo = this.kovetkezo;
 				}
 			}
 
-			private Elem fejelem;
+			private Elem<S> fejelem;
 			public int Count;
 
 			public Lancolt_lista()
 			{
-				fejelem = new Elem();
+				fejelem = new Elem<S>();
 				Count = 0;
 			}
 
-			private Elem Utolso_elem()
+			private Elem<S> Utolso_elem()
 			{
 				return fejelem.elozo;
 			}
 
-			public void Add(int tartalom)
+			public void Add(S tartalom)
 			{
-				Elem elem = new Elem(Utolso_elem(), tartalom);
+				Elem<S> elem = new Elem<S>(Utolso_elem(), tartalom);
 				Count++;
 			}
 
-			public int First()
+			public S First()
 			{
 				if (Count==0)
 				{
@@ -81,7 +82,7 @@ namespace _21f_Lancolt_lista
 				}
 				return fejelem.kovetkezo.tartalom;
 			}
-			public int Last()
+			public S Last()
 			{
 				if (Count == 0)
 				{
@@ -90,7 +91,7 @@ namespace _21f_Lancolt_lista
 				return fejelem.elozo.tartalom;
 			}
 
-			public int Element_at(int n)
+			public S Element_at(int n)
 			{
 
 				if (Count <= n)
@@ -98,7 +99,7 @@ namespace _21f_Lancolt_lista
 					throw new IndexOutOfRangeException();
 				}
 
-				Elem aktelem = fejelem.kovetkezo;
+				Elem<S> aktelem = fejelem.kovetkezo;
 
 				for (int i = 0; i < n; i++)
 				{
@@ -106,17 +107,23 @@ namespace _21f_Lancolt_lista
 				}
 
 				return aktelem.tartalom;
-				
 			}
 
-			public void Kiir()
+			/// <summary>
+			/// kicsit erőltett vizualizációja a lista belső szerkezetének.
+			/// </summary>
+			public void Diagnosztika()
 			{
-				Elem aktelem = fejelem.kovetkezo;
+				Console.WriteLine("-----------------");
+				Console.WriteLine($"Count: {Count}");
+				Console.WriteLine($"Elemek:");
+				Elem<S> aktelem = fejelem.kovetkezo;
 				for (int i = 0; i < Count; i++)
 				{
-                    Console.WriteLine(aktelem.tartalom);
+                    Console.WriteLine($"{(aktelem.elozo==fejelem?"FEJELEM": aktelem.elozo.tartalom.ToString())} -> {aktelem.tartalom.ToString()} -> {(aktelem.kovetkezo == fejelem ? "FEJELEM" : aktelem.kovetkezo.tartalom.ToString())}");
 					aktelem = aktelem.kovetkezo;
                 }
+				Console.WriteLine("-----------------");
 			}
 
 			public void RemoveAt(int n)
@@ -126,7 +133,7 @@ namespace _21f_Lancolt_lista
 					throw new IndexOutOfRangeException();
 				}
 
-				Elem aktelem = fejelem.kovetkezo;
+				Elem<S> aktelem = fejelem.kovetkezo;
 
 				for (int i = 0; i < n; i++)
 				{
@@ -136,27 +143,11 @@ namespace _21f_Lancolt_lista
 				Count--;
 			}
 
-			public void Remove_goofy(int t)
+			public void Remove(S t)
 			{
-				Elem aktelem = fejelem.kovetkezo;
+				Elem<S> aktelem = fejelem.kovetkezo;
 
-				for (int i = 0; i < Count; i++)
-				{
-					aktelem = aktelem.kovetkezo;
-					if (aktelem.tartalom == t)
-					{
-						aktelem.Torol();
-						Count--;
-						return;
-					}
-				}
-			}
-
-			public void Remove(int t)
-			{
-				Elem aktelem = fejelem.kovetkezo;
-
-				while (aktelem != fejelem && aktelem.tartalom != t)
+				while (aktelem != fejelem && !aktelem.tartalom.Equals(t))
 				{
 					aktelem = aktelem.kovetkezo;
 				}
@@ -164,20 +155,42 @@ namespace _21f_Lancolt_lista
 				Count--;
 			}
 
-			public void RemoveAll(int t)
+			public void RemoveAll(S t)
 			{
-				Elem aktelem = fejelem.kovetkezo;
+				Elem<S> aktelem = fejelem.kovetkezo;
 
-				for (int i = 0; i < Count; i++)
+				while (aktelem!= fejelem)
 				{
-					if (aktelem.tartalom == t)
+					if (aktelem.tartalom.Equals(t))
 					{
 						aktelem.Torol();
 						Count--;
 					}
-
 					aktelem = aktelem.kovetkezo;
 				}
+			}
+
+			public override string ToString()
+			{
+				string s = "[";
+
+				Elem<S> aktelem = fejelem.kovetkezo;
+				for (int i = 0; i < Count - 1; i++)
+				{
+					s += $" {aktelem.tartalom},";
+					aktelem = aktelem.kovetkezo;
+				}
+				if (0 < Count)
+				{
+					s += $" {aktelem.tartalom}";
+				}
+				s += " ]";
+				return s;  // [2, 5, 8, 9, 10, ... ]
+			}
+
+			public S Max(Func<S,S,int> rendezesi_szempont)  // comparator: rendezesi_szempont(A,B) == -1, ha "A<B"
+			{ 
+
 			}
 		}
 
@@ -185,27 +198,37 @@ namespace _21f_Lancolt_lista
 
 		static void Main(string[] args)
 		{
-			Lancolt_lista lista	 = new Lancolt_lista();
+			Lancolt_lista<int> lista = new Lancolt_lista<int>();
+			lista.Add(2);
 			lista.Add(5);
 			lista.Add(3);
 			lista.Add(2);
 			lista.Add(7);
-			Console.WriteLine(lista.First());
-			Console.WriteLine(lista.Last());
-            Console.WriteLine(lista.Element_at(2)); // 2
+			lista.Add(2);
+			lista.Add(2);
+			lista.Add(2);
+			lista.Add(2);
+			//Console.WriteLine(lista.First());
+			//Console.WriteLine(lista.Last());
+            //Console.WriteLine(lista.Element_at(2)); // 2
 
-			lista.RemoveAt(3);
-			lista.Remove(7); // az első 7-es tartalmat, amit találsz, távolítsd el
+			//lista.RemoveAt(3);
+			//lista.Remove(7); // az első 7-es tartalmat, amit találsz, távolítsd el
+			
 			lista.RemoveAll(2); // az összes 7-es tartalmat távolítsd el!
 			// A következőhöz vissza kell tenni a using System.Collections.Generic-et!
-			List<int> regi_lista = new List<int> { 5, 7, 2, 3, 4, 5, 6, 7, 7,9};
-			Lancolt_lista ujlista = new Lancolt_lista(regi_lista); // tehát kell írni egy olyan konstruktort, ami egy létező lista alapján feltölti a láncolt listát!
-			Console.WriteLine(ujlista.Sum());
-			Console.WriteLine(ujlista.Max());
-			Console.WriteLine(ujlista.Min());
 
-			Console.WriteLine("-----------------");
-			lista.Kiir();
+			List<int> regi_lista = new List<int> { 5, 7, 2, 3, 4, 5, 6, 7, 7,9};
+            //Lancolt_lista ujlista = new Lancolt_lista(regi_lista); // tehát kell írni egy olyan konstruktort, ami egy létező lista alapján feltölti a láncolt listát!
+            //Console.WriteLine(ujlista.Sum());
+            //Console.WriteLine(ujlista.Max());
+            //Console.WriteLine(ujlista.Min());
+
+            Console.WriteLine(lista); // [ 5, 3, 7 ]
+
+            Console.WriteLine("-----------------");
+
+			lista.Diagnosztika();
         }
 	}
 }
