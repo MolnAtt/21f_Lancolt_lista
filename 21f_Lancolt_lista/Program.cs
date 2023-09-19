@@ -188,9 +188,14 @@ namespace _21f_Lancolt_lista
 				return s;  // [2, 5, 8, 9, 10, ... ]
 			}
 
-			public S Max(Func<S,S,int> rendezesi_szempont)  // comparator: rendezesi_szempont(A,B) == -1, ha "A<B"
-			{ 
+			public S Max(Func<S, S, int> rendezesi_szempont)  // comparator: rendezesi_szempont(A,B) == -1, ha "A<B"
+			{
+				// itt tartottunk
 
+				// Na hogy kellett ezt?
+				// Emlékszünk?
+				// tegnapi dolgok? táblán? Excalidraw?
+				// :(
 			}
 		}
 
