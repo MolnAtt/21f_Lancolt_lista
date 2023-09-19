@@ -190,16 +190,42 @@ namespace _21f_Lancolt_lista
 
 			public S Max(Func<S, S, int> rendezesi_szempont)  // comparator: rendezesi_szempont(A,B) == -1, ha "A<B"
 			{
-				// itt tartottunk
+				// Hogyan keresünk maximumot?
+				// megnézzük az első elemet, legyen ő az első legjobb.
+				// Robi okos.
+				// Aztán sorbavesszük a többit, és ha jobbat találunk, akkor azt tekintjük a legjobbnak. 
+				// ezt kéne leláncoltlistáznunk.
 
-				// Na hogy kellett ezt?
-				// Emlékszünk?
-				// tegnapi dolgok? táblán? Excalidraw?
-				// :(
+				// az elejét azzal kezdjük, hogy elküldjük a fenébe a felhasználót, ha üres listából kér max-ot.
+				if (Count==0)
+				{
+					throw new IndexOutOfRangeException();
+				}
+				S legjobb = fejelem.kovetkezo.tartalom; // ez az első elem!
+
+				// meddig keresünk? Végig? Előbb abbahagyhatjuk?
+				// végig kell nézni! Nem szabad feladni a reményt, hogy találunk egy jobbat
+
+				Elem<S> aktelem = fejelem.kovetkezo.kovetkezo; // ez a második elem!
+				
+				while (aktelem!= fejelem) // Addig keresgélünk, míg a fejelemhez nem érünk.
+				{
+					if (rendezesi_szempont(legjobb, aktelem.tartalom)==-1) // hogyan mondjuk, hogy jobb? Kacsacsőr nem fog menni.
+					{
+						legjobb = aktelem.tartalom;
+					}
+					aktelem = aktelem.kovetkezo; // "i++"
+				}
+				return legjobb;
 			}
 		}
 
-
+		static int Számok_szokasos_rendezése(int a, int b)
+		{
+			if (a < b) return -1;
+			if (a > b) return 1;
+			return 0;
+		}
 
 		static void Main(string[] args)
 		{
@@ -234,6 +260,13 @@ namespace _21f_Lancolt_lista
             Console.WriteLine("-----------------");
 
 			lista.Diagnosztika();
-        }
+
+			// A maxhoz azért adtunk rendezési szempontot,
+			// mert az mondja el, hogy mikor nagyobb egy szám egy másiknál. Ez kell ide is.
+			// lassítsunk. Írjunk rendes rendezési szempontot, mert olyan régen volt már az is.
+
+			Console.WriteLine(lista.Max(Számok_szokasos_rendezése)); // no hogy hívjuk meg? Egy függvényt kell neki megadni. (S,S)-> bool függvényt.
+			// lambda operátorokról meséltem már? Biztosan. 
+		}
 	}
 }
